@@ -6,35 +6,62 @@
 
 namespace lve {
 
-    LvePipeline::LvePipeline(const std::string& vertFilepath, const std::string& fragFilepath) {
-        createGraphicsPipeline(vertFilepath, fragFilepath);
-    }
+   LvePipeline::LvePipeline(
+            LveDevice& device, 
+            const std::string& vertFilepath, 
+            const std::string& fragFilepath, 
+            const PipelineConfigInfo& configInfo) 
+            : lveDevice{device} {
+      createGraphicsPipeline(vertFilepath, fragFilepath, configInfo);
+   }
 
-    std::vector<char> LvePipeline::readFile(const std::string& filepath) {
+   std::vector<char> LvePipeline::readFile(const std::string& filepath) {
 
-        std::ifstream file(filepath, std::ios::ate | std::ios::binary);
+      std::ifstream file(filepath, std::ios::ate | std::ios::binary);
 
-        if (!file.is_open()) {
-            throw std::runtime_error("failed to open file: " + filepath);
-        }
+      if (!file.is_open()) {
+         throw std::runtime_error("failed to open file: " + filepath);
+      }
 
-        size_t fileSize = static_cast<size_t>(file.tellg());
-        std::vector<char> buffer(fileSize);
+      size_t fileSize = static_cast<size_t>(file.tellg());
+      std::vector<char> buffer(fileSize);
 
-        file.seekg(0);
-        file.read(buffer.data(), fileSize);
+      file.seekg(0);
+      file.read(buffer.data(), fileSize);
 
-        file.close();
-        return buffer;
-    }
+      file.close();
+      return buffer;
+   }
 
-    void LvePipeline::createGraphicsPipeline(
-        const std::string& vertFilepath, const std::string& fragFilepath) {
+   void LvePipeline::createGraphicsPipeline(
+      const std::string& vertFilepath, 
+      const std::string& fragFilepath, 
+      const PipelineConfigInfo& configInfo) {
 
-        auto vertCode = readFile(vertFilepath);
-        auto fragCode = readFile(fragFilepath);
+      auto vertCode = readFile(vertFilepath);
+      auto fragCode = readFile(fragFilepath);
 
-        std::cout << "Vertex Shader Code Size: " << vertCode.size() << '\n';
-        std::cout << "Fragment Shader Code Size: " << fragCode.size() << '\n';
-    }
+      std::cout << "Vertex Shader Code Size: " << vertCode.size() << '\n';
+      std::cout << "Fragment Shader Code Size: " << fragCode.size() << '\n';
+   }
+
+   void LvePipeline::createShaderModule(const std::vector<char>& code, VkShaderModule* shaderModule) {
+      //common pattern in vulkan: rather than calling function with a lot of parameters, create a struct and call a function with a pointer to it
+      VkShaderModuleCreateInfo createInfo{};
+      createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+      //size of vector array
+      createInfo.codeSize = code.size();
+      //pointer to code (expects uint32 not char). Be careful, they aren't the same size. 
+      createInfo.pCode = reinterpret_cast<const uint32_t*>(code.data());
+
+      if (vkCreateShaderModule(lveDevice.device(), &createInfo, nullptr, shaderModule) != VK_SUCCESS) {
+         throw std::runtime_error("failed to create shader module");
+      }
+   }
+
+   PipelineConfigInfo LvePipeline::defaultPipelineConfigInfo(uint32_t width, uint32_t height) {
+      PipelineConfigInfo configInfo{};
+
+      return configInfo;
+   }
 }

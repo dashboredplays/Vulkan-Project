@@ -10,7 +10,6 @@ int main() {
 	try
 	{
 		app.run();
-		cout << "Success" << endl;
 	}
 	catch (const std::exception&e)
 	{

@@ -1,5 +1,6 @@
 #include "vulkan_window.hpp"
 
+#include <stdexcept>
 namespace lve {
 	LveWindow::LveWindow(int w, int h, string name) : width{ w }, height{ h }, windowName{ name } {
 		initWindow();
@@ -19,4 +20,10 @@ namespace lve {
 		//null pointer - object handle doesn't point to object
 		window = glfwCreateWindow(width, height, windowName.c_str(), nullptr, nullptr);
 	}
+
+   void LveWindow::createWindowSurface(VkInstance instance, VkSurfaceKHR *surface) {
+      if (glfwCreateWindowSurface(instance, window, nullptr, surface) != VK_SUCCESS) {
+         throw std::runtime_error("failed to create window surface");
+      }
+   }
 }
