@@ -3,6 +3,7 @@
 #include "vulkan_window.hpp"
 #include "vulkan_pipeline.hpp"
 #include "vulkan_swap_chain.hpp"
+#include "vulkan_model.hpp"
 
 #include <memory>
 #include <vector>
@@ -23,6 +24,7 @@ namespace lve {
 			void run();
 
 		private:
+         void loadModels();
          void createPipelineLayout();
          void createPipeline();
          void createCommandBuffers();
@@ -36,5 +38,6 @@ namespace lve {
 			std::unique_ptr<LvePipeline> lvePipeline;
          VkPipelineLayout pipelineLayout;
          std::vector<VkCommandBuffer> commandBuffers;
+         std::unique_ptr<LveModel> lveModel;
 	};
 }

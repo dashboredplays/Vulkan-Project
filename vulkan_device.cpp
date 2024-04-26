@@ -428,6 +428,7 @@ void LveDevice::createBuffer(
   VkMemoryRequirements memRequirements;
   vkGetBufferMemoryRequirements(device_, buffer, &memRequirements);
 
+  //allocate memory of proper size
   VkMemoryAllocateInfo allocInfo{};
   allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
   allocInfo.allocationSize = memRequirements.size;

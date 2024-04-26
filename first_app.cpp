@@ -6,6 +6,7 @@
 namespace lve {
 
 	FirstApp::FirstApp() {
+      loadModels();
 		createPipelineLayout();
 		createPipeline();
 		createCommandBuffers();
@@ -27,6 +28,16 @@ namespace lve {
          drawFrame();
 		}
 	}
+
+   void FirstApp::loadModels() {
+      std::vector<LveModel::Vertex> vertices {
+         {{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+         {{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
+         {{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}
+      };
+
+      lveModel = std::make_unique<LveModel>(lveDevice, vertices);
+   }
 
 	void FirstApp::createPipelineLayout() {
 		VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
@@ -99,7 +110,7 @@ namespace lve {
 
          std::array<VkClearValue, 2> clearValues{};
          //currently, we have 0 as the color attachment, and 1 as the depth attachment in the frame buffer
-         clearValues[0].color = { 0.467f, 0.388f, 0.906f, 1.0f }; //light purple
+         clearValues[0].color = {0.1f, 0.1f, 0.1f, 1.0f};
          clearValues[1].depthStencil = { 1.0f, 0 };
          renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
          renderPassInfo.pClearValues = clearValues.data();
@@ -109,9 +120,11 @@ namespace lve {
 
          //use -> to access member of a structure through a pointer
          lvePipeline->bind(commandBuffers[i]);
+         lveModel->bind(commandBuffers[i]);
+         lveModel->draw(commandBuffers[i]);
          //draw 3 vertices in 1 instance
          //0, 0 because we aren't using offsets
-         vkCmdDraw(commandBuffers[i], 3, 1, 0, 0);
+         //vkCmdDraw(commandBuffers[i], 3, 1, 0, 0);
 
          vkCmdEndRenderPass(commandBuffers[i]);
          if (vkEndCommandBuffer(commandBuffers[i]) != VK_SUCCESS) {
