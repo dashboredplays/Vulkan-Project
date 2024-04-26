@@ -3,7 +3,7 @@
     "tasks": [
         {
             "label": "build",
-            "command": "${workspaceFolder}/src/build.bat",
+            "command": "${workspaceFolder}/build.bat",
             "group": {
                 "kind": "build",
                 "isDefault": true
