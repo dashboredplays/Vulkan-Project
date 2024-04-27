@@ -10,10 +10,9 @@ namespace lve {
    //structs are used to store several related variables in one place 
    struct PipelineConfigInfo {
       PipelineConfigInfo(const PipelineConfigInfo&) = delete;
-      PipelineConfigInfo() = default;
       PipelineConfigInfo& operator=(const PipelineConfigInfo&) = delete;
-      VkViewport viewport;
-      VkRect2D scissor;
+      PipelineConfigInfo() = default;
+
       VkPipelineViewportStateCreateInfo viewportInfo;
       VkPipelineInputAssemblyStateCreateInfo inputAssemblyInfo;
       VkPipelineRasterizationStateCreateInfo rasterizationInfo;
@@ -21,6 +20,8 @@ namespace lve {
       VkPipelineColorBlendAttachmentState colorBlendAttachment;
       VkPipelineColorBlendStateCreateInfo colorBlendInfo;
       VkPipelineDepthStencilStateCreateInfo depthStencilInfo;
+      std::vector<VkDynamicState> dynamicStateEnables;
+      VkPipelineDynamicStateCreateInfo dynamicStateInfo;
       VkPipelineLayout pipelineLayout = nullptr;
       VkRenderPass renderPass = nullptr;
       uint32_t subpass = 0;
@@ -37,12 +38,13 @@ namespace lve {
          ~LvePipeline();
 
          LvePipeline(const LvePipeline&) = delete;
-         void operator=(const LvePipeline&) = delete;
+         LvePipeline& operator=(const LvePipeline&) = delete;
+         LvePipeline() = default;
 
          void bind(VkCommandBuffer commandBuffer);
 
          //static PipelineConfigInfo defaultPipelineConfigInfo(uint32_t width, uint32_t height);
-         static void defaultPipelineConfigInfo(PipelineConfigInfo& configInfo, uint32_t width, uint32_t height);
+         static void defaultPipelineConfigInfo(PipelineConfigInfo& configInfo);
 
       private:
          static std::vector<char> readFile(const std::string& filepath);

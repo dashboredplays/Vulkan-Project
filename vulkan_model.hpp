@@ -28,6 +28,7 @@ namespace lve {
 
          LveModel(const LveModel&) = delete;
          LveModel& operator=(const LveModel &) = delete;
+         LveModel() = default;
 
          void bind(VkCommandBuffer commandBuffer);
          void draw(VkCommandBuffer commandBuffer);

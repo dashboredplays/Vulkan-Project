@@ -52,7 +52,8 @@ namespace lve {
     }
 
     std::vector<VkVertexInputAttributeDescription> LveModel::Vertex::getAttributeDescriptions() {
-        std::vector<VkVertexInputAttributeDescription> attributeDescriptions(1);
+        //attribute vector size 2, one for position and one for color
+        std::vector<VkVertexInputAttributeDescription> attributeDescriptions(2);
 
         attributeDescriptions[0].binding = 0;
         //location specified in vertex shader

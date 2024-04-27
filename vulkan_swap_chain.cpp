@@ -13,6 +13,18 @@ namespace lve {
 
 LveSwapChain::LveSwapChain(LveDevice &deviceRef, VkExtent2D extent)
     : device{deviceRef}, windowExtent{extent} {
+  init();
+}
+
+LveSwapChain::LveSwapChain(LveDevice &deviceRef, VkExtent2D extent, std::shared_ptr<LveSwapChain> previous)
+    : device{deviceRef}, windowExtent{extent}, oldSwapChain{previous} {
+  init();
+
+  // clean up old swap chain
+  oldSwapChain = nullptr;
+}
+
+void LveSwapChain::init() {
   createSwapChain();
   createImageViews();
   createRenderPass();
@@ -162,7 +174,7 @@ void LveSwapChain::createSwapChain() {
   createInfo.presentMode = presentMode;
   createInfo.clipped = VK_TRUE;
 
-  createInfo.oldSwapchain = VK_NULL_HANDLE;
+  createInfo.oldSwapchain = oldSwapChain == nullptr ? VK_NULL_HANDLE : oldSwapChain->swapChain;
 
   if (vkCreateSwapchainKHR(device.device(), &createInfo, nullptr, &swapChain) != VK_SUCCESS) {
     throw std::runtime_error("failed to create swap chain!");
@@ -362,6 +374,7 @@ void LveSwapChain::createSyncObjects() {
 VkSurfaceFormatKHR LveSwapChain::chooseSwapSurfaceFormat(
     const std::vector<VkSurfaceFormatKHR> &availableFormats) {
   for (const auto &availableFormat : availableFormats) {
+    //SRGB and UNORM are different ways to represent color
     if (availableFormat.format == VK_FORMAT_B8G8R8A8_SRGB &&
         availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
       return availableFormat;
