@@ -16,8 +16,8 @@ namespace lve {
 
       struct Vertex {
          //we are going to interleave the color attribute with the position attribute
-         glm::vec2 position;
-         glm::vec3 color;
+         glm::vec3 position{};
+         glm::vec3 color{};
 
          static std::vector<VkVertexInputBindingDescription> getBindingDescriptions();
          static std::vector<VkVertexInputAttributeDescription> getAttributeDescriptions();

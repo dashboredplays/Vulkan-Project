@@ -41,45 +41,75 @@ namespace lve {
 		}
 	}
 
+      // temporary helper function, creates a 1x1x1 cube centered at offset
+   std::unique_ptr<LveModel> createCubeModel(LveDevice& device, glm::vec3 offset) {
+   std::vector<LveModel::Vertex> vertices{
+   
+         // left face (white)
+         {{-.5f, -.5f, -.5f}, {.9f, .9f, .9f}},
+         {{-.5f, .5f, .5f}, {.9f, .9f, .9f}},
+         {{-.5f, -.5f, .5f}, {.9f, .9f, .9f}},
+         {{-.5f, -.5f, -.5f}, {.9f, .9f, .9f}},
+         {{-.5f, .5f, -.5f}, {.9f, .9f, .9f}},
+         {{-.5f, .5f, .5f}, {.9f, .9f, .9f}},
+   
+         // right face (yellow)
+         {{.5f, -.5f, -.5f}, {.8f, .8f, .1f}},
+         {{.5f, .5f, .5f}, {.8f, .8f, .1f}},
+         {{.5f, -.5f, .5f}, {.8f, .8f, .1f}},
+         {{.5f, -.5f, -.5f}, {.8f, .8f, .1f}},
+         {{.5f, .5f, -.5f}, {.8f, .8f, .1f}},
+         {{.5f, .5f, .5f}, {.8f, .8f, .1f}},
+   
+         // top face (orange, remember y axis points down)
+         {{-.5f, -.5f, -.5f}, {.9f, .6f, .1f}},
+         {{.5f, -.5f, .5f}, {.9f, .6f, .1f}},
+         {{-.5f, -.5f, .5f}, {.9f, .6f, .1f}},
+         {{-.5f, -.5f, -.5f}, {.9f, .6f, .1f}},
+         {{.5f, -.5f, -.5f}, {.9f, .6f, .1f}},
+         {{.5f, -.5f, .5f}, {.9f, .6f, .1f}},
+   
+         // bottom face (red)
+         {{-.5f, .5f, -.5f}, {.8f, .1f, .1f}},
+         {{.5f, .5f, .5f}, {.8f, .1f, .1f}},
+         {{-.5f, .5f, .5f}, {.8f, .1f, .1f}},
+         {{-.5f, .5f, -.5f}, {.8f, .1f, .1f}},
+         {{.5f, .5f, -.5f}, {.8f, .1f, .1f}},
+         {{.5f, .5f, .5f}, {.8f, .1f, .1f}},
+   
+         // nose face (blue)
+         {{-.5f, -.5f, 0.5f}, {.1f, .1f, .8f}},
+         {{.5f, .5f, 0.5f}, {.1f, .1f, .8f}},
+         {{-.5f, .5f, 0.5f}, {.1f, .1f, .8f}},
+         {{-.5f, -.5f, 0.5f}, {.1f, .1f, .8f}},
+         {{.5f, -.5f, 0.5f}, {.1f, .1f, .8f}},
+         {{.5f, .5f, 0.5f}, {.1f, .1f, .8f}},
+   
+         // tail face (green)
+         {{-.5f, -.5f, -0.5f}, {.1f, .8f, .1f}},
+         {{.5f, .5f, -0.5f}, {.1f, .8f, .1f}},
+         {{-.5f, .5f, -0.5f}, {.1f, .8f, .1f}},
+         {{-.5f, -.5f, -0.5f}, {.1f, .8f, .1f}},
+         {{.5f, -.5f, -0.5f}, {.1f, .8f, .1f}},
+         {{.5f, .5f, -0.5f}, {.1f, .8f, .1f}},
+   
+      };
+      for (auto& v : vertices) {
+         v.position += offset;
+      }
+      return std::make_unique<LveModel>(device, vertices);
+   }
+
    void FirstApp::loadGameObjects() {
-      std::vector<LveModel::Vertex> vertices {
-         {{0.0f, -0.5f}, {1.0f, 0.0f, 0.0f}},
-         {{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
-         {{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}
-      };
+      //viewing box: -1<x<1, -1<y<1, 0<z<1
+      //only things that are inside the box will be rendered
+      std::shared_ptr<LveModel> lveModel = createCubeModel(lveDevice, {0.f, 0.f, 0.f});
 
-      //make_shared: 1 model instance to be used by multiple game objects. Will stay in memory as long as at least one game object is using it.
-      auto lveModel = std::make_shared<LveModel>(lveDevice, vertices);
-
-      std::vector<glm::vec3> colors{
-         {1.f, .7f, .73f},
-         {1.f, .87f, .73f},
-         {1.f, 1.f, .73f},
-         {.73f, 1.f, .8f},
-         {.73, .88f, 1.f}  //
-      };
-      for (auto& color : colors) {
-         color = glm::pow(color, glm::vec3{2.2f});
-      }
-      for (int i = 0; i < 40; i++) {
-         auto triangle = LveGameObject::createGameObject();
-         triangle.model = lveModel;
-         triangle.transform2d.scale = glm::vec2(.5f) + i * 0.025f;
-         triangle.transform2d.rotation = i * glm::pi<float>() * .025f;
-         triangle.color = colors[i % colors.size()];
-         gameObjects.push_back(std::move(triangle));
-      }
-
-      // auto triangle = LveGameObject::createGameObject();
-      // triangle.model = lveModel;
-      // triangle.color = {.1f, 0.8f, 0.1f};
-      // triangle.transform2d.translation.x = 0.2f;
-      // triangle.transform2d.scale = {2.f, 0.5f};
-      // //radians. In this example, we are rotating the triangle by 0.25 * 2pi = 90 degrees
-      // //this transformation will rotate counter clockwise
-      // triangle.transform2d.rotation = 0.25f * glm::two_pi<float>();
-
-      // gameObjects.push_back(std::move(triangle));
+      auto cube = LveGameObject::createGameObject();
+      cube.model = lveModel;
+      cube.transform.translation = {0.f, 0.f, 0.5f};
+      cube.transform.scale = {0.5f, 0.5f, 0.5f};
+      gameObjects.push_back(std::move(cube));
    }
 
 

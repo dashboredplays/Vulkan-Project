@@ -13,8 +13,7 @@ namespace lve {
 
    struct SimplePushConstantData {
       //identity matrix (just main diagonal)
-      glm::mat2 transform{1.f};
-      glm::vec2 offset;
+      glm::mat4 transform{1.f};
       //need alignas to ensure that the data is aligned to 16 bytes, which is a requirement for push constants. 
       //By default, glm::vec3 is not 16 byte aligned. So, we need to specify the alignment manually.
       alignas(16) glm::vec3 color;
@@ -76,13 +75,12 @@ namespace lve {
       int i = 0;
       for (auto& obj: gameObjects) {
          i += 1;
-         obj.transform2d.rotation = 
-         glm::mod<float>(obj.transform2d.rotation + 0.00002f * i, 2.f * glm::pi<float>());
+         obj.transform.rotation.y = glm::mod<float>(obj.transform.rotation.y + 0.001f, glm::two_pi<float>());
+         obj.transform.rotation.x = glm::mod<float>(obj.transform.rotation.x + 0.0005f, glm::two_pi<float>());
 
          SimplePushConstantData push{};
-         push.offset = obj.transform2d.translation;
          push.color = obj.color;
-         push.transform = obj.transform2d.mat2();
+         push.transform = obj.transform.mat4();
 
          vkCmdPushConstants(
             commandBuffer, 

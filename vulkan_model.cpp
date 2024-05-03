@@ -58,8 +58,9 @@ namespace lve {
         attributeDescriptions[0].binding = 0;
         //location specified in vertex shader
         attributeDescriptions[0].location = 0;
-        //data type: 2 components, each 32 bit floats
-        attributeDescriptions[0].format = VK_FORMAT_R32G32_SFLOAT;
+        //data type: 3 components, each 32 bit 
+        //REMEMBER TO CHANGE THIS WHEN CHANGING VERTEX STRUCTURE
+        attributeDescriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT;
         attributeDescriptions[0].offset = offsetof(Vertex, position);
 
         attributeDescriptions[1].binding = 0;

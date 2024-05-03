@@ -2,30 +2,59 @@
 
 #include "vulkan_model.hpp"
 
+#include <glm/gtc/matrix_transform.hpp>
+
 #include <memory>
 
 namespace lve {
    //better way is to use entity component system as opposed to OOP. https://www.kodeco.com/2806-introduction-to-component-based-architecture-in-games
 
-   struct Transform2dComponent {
+   struct TransformComponent {
       //the position offset of the object
-      glm::vec2 translation{};
+      glm::vec3 translation{};
       //scale transformation of the object
-      glm::vec2 scale{1.f, 1.f};
+      glm::vec3 scale{1.f, 1.f, 1.f};
       //rotation of the object
-      float rotation;
+      glm::vec3 rotation{};
 
-      glm::mat2 mat2() { 
-         //rotation matrix
-         const float s = glm::sin(rotation);
-         const float c = glm::cos(rotation);
-         glm::mat2 rotMatrix{{c, -s}, {s, c}};
-         //each entry is a column vector, NOT ROW VECTOR
-         glm::mat2 scaleMat{{scale.x, .0f}, {.0f, scale.y}};
-         //we can combine several transformations into one matrix
-         //this first scales the object, then rotates it. Remember the order
-         return rotMatrix * scaleMat;
-      }
+   // Matrix corrsponds to Translate * Ry * Rx * Rz * Scale
+   // Rotations correspond to Tait-bryan angles of Y(1), X(2), Z(3)
+   // https://en.wikipedia.org/wiki/Euler_angles#Rotation_matrix
+   glm::mat4 mat4() {
+      //in 3d, rotation becomes much more complex. You can use either euler angles or quaternions.
+      //for proper euler angles, 1st and 3rd angles use the same axis.
+      //for tait-bryan angles, all angles use distinct axes.
+      //also exists axis angles, which is a single angle around a single axis.
+      const float c3 = glm::cos(rotation.z);
+      const float s3 = glm::sin(rotation.z);
+      const float c2 = glm::cos(rotation.x);
+      const float s2 = glm::sin(rotation.x);
+      const float c1 = glm::cos(rotation.y);
+      const float s1 = glm::sin(rotation.y);
+      return glm::mat4{
+         {
+            scale.x * (c1 * c3 + s1 * s2 * s3),
+            scale.x * (c2 * s3),
+            scale.x * (c1 * s2 * s3 - c3 * s1),
+            0.0f,
+         },
+         {
+            scale.y * (c3 * s1 * s2 - c1 * s3),
+            scale.y * (c2 * c3),
+            scale.y * (c1 * c3 * s2 + s1 * s3),
+            0.0f,
+         },
+         {
+            scale.z * (c2 * s1),
+            scale.z * (-s2),
+            scale.z * (c1 * c2),
+            0.0f,
+         },
+         {translation.x, translation.y, translation.z, 1.0f}};
+   }
+   //extrinsic rotation is when axeses of x, y, and z are fixed in the world space.
+   //intrinsic rotation is when the axeses are fixed to the object. (yaw, pitch, roll)
+   //example: as an extrinsic rotation, this rotation transformation Y(1), X(2), Z(3) can be read from right to left, while intrinsic rotation can be read from left to right.
    };
 
    class LveGameObject {
@@ -46,7 +75,7 @@ namespace lve {
 
       std::shared_ptr<LveModel> model{};
       glm::vec3 color{};
-      Transform2dComponent transform2d{};
+      TransformComponent transform{};
 
       private:
       LveGameObject(id_t objId) : id(objId) {}
