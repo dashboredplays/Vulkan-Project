@@ -25,6 +25,12 @@ namespace lve {
       //for proper euler angles, 1st and 3rd angles use the same axis.
       //for tait-bryan angles, all angles use distinct axes.
       //also exists axis angles, which is a single angle around a single axis.
+
+      //the object is originally at the origin in object space. This matrix moves the object into the shared world space. 
+      //Every object then has the camera transform applied to it (moving it to camera space).
+      //a camera object doesn't actually exist in the scene. It is a transform that is applied to every object in the scene.
+      //finally, apply the projection matrix, which captures everything that is in the viewing furstum, and transforms it into the canonical viewing volume.
+      //the viewport transform then converts it to the actual pixel volume.
       const float c3 = glm::cos(rotation.z);
       const float s3 = glm::sin(rotation.z);
       const float c2 = glm::cos(rotation.x);

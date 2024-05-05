@@ -1,5 +1,6 @@
 #include "first_app.hpp"
 #include "render_system.hpp"
+#include "vulkan_camera.hpp"
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
@@ -22,10 +23,20 @@ namespace lve {
 
 	void FirstApp::run() {
       SimpleRenderSystem simpleRenderSystem{lveDevice, lveRenderer.getSwapChainRenderPass()};
+      LveCamera camera{};
+      //camera.setViewDirection(glm::vec3(0.f), glm::vec3(0.5f, 0.f, 1.f));
+      camera.setViewTarget(glm::vec3(-1.f, -2.f, 2.f), glm::vec3(0.f, 0.f, 2.5f));
 
 		while (!lveWindow.shouldClose()) {
 			//keystrokes, exit clicks, etc.
 			glfwPollEvents();
+
+         //using aspect ratio will keep the image from being stretched
+         float aspect = lveRenderer.getAspectRatio();
+         //kept up to date with window size (aspect ratio)
+         //camera.setOrthographicProjection(-aspect, aspect, -1, 1, -1, 1);
+         //common values are between 45 and 60 degrees
+         camera.setPerspectiveProjection(glm::radians(50.f), aspect, 0.1f, 10.f);
          
          if (auto commandBuffer = lveRenderer.beginFrame()) {
             
@@ -34,7 +45,7 @@ namespace lve {
             //end offscreen shadow pass
             
             lveRenderer.beginSwapChainRenderPass(commandBuffer);
-            simpleRenderSystem.renderGameObjects(commandBuffer, gameObjects);
+            simpleRenderSystem.renderGameObjects(commandBuffer, gameObjects, camera);
             lveRenderer.endSwapChainRenderPass(commandBuffer);
             lveRenderer.endFrame();
          }
@@ -107,7 +118,8 @@ namespace lve {
 
       auto cube = LveGameObject::createGameObject();
       cube.model = lveModel;
-      cube.transform.translation = {0.f, 0.f, 0.5f};
+      //translations of x, y, and z (z for depth)
+      cube.transform.translation = {0.f, 0.f, 2.5f};
       cube.transform.scale = {0.5f, 0.5f, 0.5f};
       gameObjects.push_back(std::move(cube));
    }
