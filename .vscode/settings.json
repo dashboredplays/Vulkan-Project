@@ -64,6 +64,12 @@
       "unordered_set": "cpp",
       "xhash": "cpp",
       "cassert": "cpp",
-      "*.vert": "c"
+      "*.vert": "c",
+      "chrono": "cpp",
+      "forward_list": "cpp",
+      "iomanip": "cpp",
+      "ratio": "cpp",
+      "functional": "cpp",
+      "unordered_map": "cpp"
    }
 }

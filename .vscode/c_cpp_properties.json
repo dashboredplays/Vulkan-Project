@@ -5,7 +5,8 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "${VULKAN_SDK}/Include",
-                "C:/Users/Matthew/glfw-3.3.9.bin.WIN64/glfw-3.3.9.bin.WIN64/include"
+                "C:/Users/Matthew/glfw-3.3.9.bin.WIN64/glfw-3.3.9.bin.WIN64/include",
+                "C:/Users/Matthew/tinyobjloader"
             ],
             "defines": [
                 "_DEBUG",
